@@ -1,0 +1,23 @@
+package wordfeud.core;
+
+public class WildcardPiece extends Piece {
+	
+	public WildcardPiece() {
+		super(NO_LETTER);
+	}
+	
+	public String toString() {
+		return super.toString() + "*";
+	}
+	
+	public void setLetter(char letter) {
+		if (! Character.isLetter(letter)) {
+			throw new IllegalArgumentException("'" + letter + "' is not a letter");
+		}
+		this.letter = Character.toLowerCase(letter);
+	}
+	
+	public void clearLetter(char letter) {
+		this.letter = NO_LETTER;
+	}
+}

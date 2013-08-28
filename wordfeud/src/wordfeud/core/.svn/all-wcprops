@@ -1,0 +1,119 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core
+END
+Piece.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/Piece.java
+END
+Letters.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/Letters.java
+END
+OrdbankWords.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/OrdbankWords.java
+END
+WordFeudListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/WordFeudListener.java
+END
+AbstractLetters.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/AbstractLetters.java
+END
+Words.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/Words.java
+END
+Board.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/Board.java
+END
+CellListBoard.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/CellListBoard.java
+END
+AbstractCellBoard.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/AbstractCellBoard.java
+END
+Cell.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/Cell.java
+END
+CompositeWords.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/CompositeWords.java
+END
+Player.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/Player.java
+END
+MutableBoard.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/MutableBoard.java
+END
+BoardLocation.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/BoardLocation.java
+END
+BoardListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/BoardListener.java
+END
+WordFeud.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/WordFeud.java
+END
+LanguageLetters.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/LanguageLetters.java
+END
+WildcardPiece.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/WildcardPiece.java
+END
+DictionaryWords.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/tdt4100/!svn/ver/483/ovinger/trunk/wordfeud/src/wordfeud/core/DictionaryWords.java
+END

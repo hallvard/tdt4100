@@ -1,0 +1,78 @@
+package wordfeud.core;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+public class OrdbankWords implements Words {
+
+	private SortedSet<String> wordSet = new TreeSet<String>();
+	
+	private void read(InputStream input) throws IOException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(input, "iso-8859-1"));
+		String line = null;
+		while ((line = reader.readLine()) != null) {
+			char[] chars = line.toCharArray();
+			int tokenCount = 0, start = 0, end = -1;
+			String word = null, wordClass = null;
+			while (start < line.length()) {
+				end = line.indexOf('\t', start);
+				if (end < 0) {
+					end = line.length();
+				}
+				tokenCount++;
+				if (tokenCount == 3) {
+					word = new String(chars, start, end - start);
+				} else if (tokenCount == 4) {
+					wordClass = new String(chars, start, end - start);
+				}
+				start = end + 1;
+			}
+			if (word != null && word.length() > 0) {
+				if (isLegalWord(word, wordClass)) {
+					wordSet.add(word.toLowerCase());
+//				} else {
+//					System.out.println("Discarding " + word);
+				}
+			}
+		}
+	}
+	
+	protected boolean isLegalWord(String word, String wordClass) {
+		if ("fork".equals(wordClass) || "symb".equals(wordClass)) {
+			return false;
+		}
+		int count = word.length(), lowerCount = 0, upperCount = 0;
+		for (int i = 0; i < count; i++) {
+			char c = word.charAt(i);
+			if (! Character.isLetter(c)) {
+				return false;
+			}
+			if (Character.isLowerCase(c)) {
+				lowerCount++;
+			} else if (Character.isUpperCase(c)) {
+				upperCount++;
+			}
+		}
+		return lowerCount == count || (upperCount == count && count > 1);
+	}
+	
+	public OrdbankWords(String resourcePath) {
+		try {
+			read(getClass().getResourceAsStream(resourcePath));
+		} catch (IOException e) {
+		}
+	}
+	
+	public static OrdbankWords loadNorskBM() {
+		return new OrdbankWords("/wordfeud/ordbank_bm/fullform_bm.txt");
+	}
+	
+	@Override
+	public boolean hasWord(String word) {
+		return wordSet.contains(word);
+	}
+}

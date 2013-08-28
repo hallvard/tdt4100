@@ -1,0 +1,22 @@
+package wordfeud.core;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+public class DictionaryWords implements Words {
+
+	private Dictionary<String, Boolean> dictionary = new Hashtable<String, Boolean>();
+	
+	public void addWord(String word) {
+		dictionary.put(word, true);
+	}
+	
+	public void removeWord(String word) {
+		dictionary.remove(word);
+	}
+	
+	@Override
+	public boolean hasWord(String word) {
+		return dictionary.get(word);
+	}
+}

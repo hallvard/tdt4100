@@ -1,0 +1,24 @@
+package wordfeud.core;
+
+public class Piece {
+	
+	public static final char NO_LETTER = '\0';
+
+	protected char letter;
+	
+	public Piece(char letter) {
+		this.letter = Character.toUpperCase(letter);
+	}
+	
+	public String toString() {
+		return String.valueOf(letter);
+	}
+	
+	public Piece() {
+		this(NO_LETTER);
+	}
+	
+	public char getLetter() {
+		return letter;
+	}
+}

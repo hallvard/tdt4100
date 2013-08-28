@@ -1,0 +1,22 @@
+package wordfeud.core;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Player {
+
+	private List<Piece> pieces = new ArrayList<Piece>(7);
+	private int points = 0;
+	
+	List<Piece> getPieces() {
+		return pieces;
+	}
+	
+	public int getPoints() {
+		return points;
+	}
+	
+	void addPoints(int points) {
+		this.points += points;
+	}
+}

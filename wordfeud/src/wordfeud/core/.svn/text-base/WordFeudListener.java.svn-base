@@ -1,0 +1,5 @@
+package wordfeud.core;
+
+public interface WordFeudListener {
+	public void piecesChanged(int pos);
+}

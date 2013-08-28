@@ -1,0 +1,314 @@
+package wordfeud.core;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class WordFeud {
+
+	private Words words;
+	private Letters letters;
+	private MutableBoard board;
+
+	private List<Piece> bag = new ArrayList<Piece>();
+	private List<Player> players;
+	private int currentPlayer;
+
+	public WordFeud(int playerCount) {
+		words = OrdbankWords.loadNorskBM();
+		letters = LanguageLetters.load("nb");
+		board = CellListBoard.load("default");
+		for (Character letter : letters) {
+			addPieces(bag, letter, letters.getCount(letter));
+		}
+		addPieces(bag, Piece.NO_LETTER, 2);
+		shufflePieces(bag, 10);
+		players = new ArrayList<Player>(playerCount);
+		while (playerCount-- > 0) {
+			Player player = new Player();
+			movePieces(bag, player.getPieces(), 7);
+			players.add(player);
+		}
+		currentPlayer = (int) (Math.random() * players.size());
+	}
+	public WordFeud() {
+		this(2);
+	}		
+
+	private void addPieces(List<Piece> pieces, char letter, int count) {
+		while (count-- > 0) {
+			pieces.add(letter == Piece.NO_LETTER ? new WildcardPiece() : new Piece(Character.toUpperCase(letter)));
+		}
+	}
+
+	private void shufflePieces(List<Piece> pieces, int times) {
+		while (times-- > 0) {
+			for (int i = 0; i < pieces.size(); i++) {
+				Piece piece = pieces.get(i);
+				int pos = (int)(Math.random() * pieces.size());
+				pieces.set(i, pieces.get(pos));
+				pieces.set(pos, piece);
+			}
+		}
+	}
+	
+	private void movePieces(List<Piece> source, List<Piece> target, int count) {
+		while (count-- != 0) {
+			if (source.isEmpty()) {
+				break;
+			}
+			Piece piece = source.remove(source.size() - 1);
+			int pos = target.indexOf(null);
+			if (pos >= 0) {
+				target.set(pos, piece);
+			} else {
+				target.add(piece);
+			}
+		}
+	}
+	
+	public Words getWords() {
+		return words;
+	}
+	
+	public Letters getLetters() {
+		return letters;
+	}
+	
+	public Board getBoard() {
+		return board;
+	}
+	
+	//
+	
+	private Map<Piece, BoardLocation> placedPieces = new HashMap<Piece, BoardLocation>();
+
+	public boolean isPlacedPiece(Piece piece) {
+		return placedPieces.containsKey(piece);
+	}
+	
+	// move from pieces to board
+	public void placePiece(int sourcePos, int targetX, int targetY) {
+		if (board.getPiece(targetX, targetY) != null) {
+			throw new IllegalArgumentException("The target location " + targetX + "," + targetY + " is occupied");
+		}
+		placePiece(clearPiece(sourcePos), targetX, targetY);
+	}
+	
+	private Piece clearPiece(int pos) {
+		List<Piece> pieces = getCurrentPieces();
+		Piece piece = pieces.get(pos);
+		pieces.set(pos, null);
+		firePiecesChanged(pos);
+		return piece;
+	}
+
+	private void placePiece(Piece piece, int x, int y) {
+		board.setPiece(x, y, piece);
+		placedPieces.put(piece, new BoardLocation(x, y));
+	}
+	
+	// move within board
+	public void movePiece(int sourceX, int sourceY, int targetX, int targetY) {
+		Piece piece = board.getPiece(sourceX, sourceY);
+		if (! isPlacedPiece(piece)) {
+			throw new IllegalArgumentException("The piece " + piece + " at " + sourceX + "," + sourceY + " cannot be moved");
+		}
+		if (board.getPiece(targetX, targetY) != null) {
+			throw new IllegalArgumentException("The target location " + targetX + "," + targetY + " is occupied");
+		}
+		board.setPiece(sourceX, sourceY, null);
+		placePiece(piece, targetX, targetY);
+	}
+
+	private void setPiece(Piece piece, int pos) {
+		if (getPiece(pos) != null) {
+			List<Piece> pieces = getCurrentPieces();
+			int emptyPos = pieces.indexOf(null);
+			if (emptyPos < 0) {
+				throw new IllegalArgumentException("Cannot make room for piece at " + pos);
+			}
+			pieces.remove(emptyPos);
+			pieces.add(pos, null);
+			firePiecesChanged(Math.min(pos, emptyPos), -1);
+		}
+		getCurrentPieces().set(pos, piece);
+		firePiecesChanged(pos);
+	}
+	
+	// move from board back to pieces
+	public void placePieceBack(int sourceX, int sourceY, int targetPos) {
+		Piece piece = board.getPiece(sourceX, sourceY);
+		board.setPiece(sourceX, sourceY, null);
+		if (! isPlacedPiece(piece)) {
+			throw new IllegalArgumentException("The piece " + piece + " at " + sourceX + "," + sourceY + " cannot be moved");
+		}
+		setPiece(piece, targetPos);
+		placedPieces.remove(piece);
+	}
+
+	// move within pieces
+	public void movePiece(int sourcePos, int targetPos) {
+		setPiece(clearPiece(sourcePos), targetPos);
+	}
+
+	private Player getCurrentPlayer() {
+		return players.get(currentPlayer);
+	}
+
+	private List<Piece> getCurrentPieces() {
+		return getCurrentPlayer().getPieces();
+	}
+
+	public Piece getPiece(int i) {
+		List<Piece> pieces = getCurrentPieces();
+		return i < pieces.size() ? pieces.get(i) : null;
+	}
+	
+	public void playPieces() {
+		int points = -1;
+		try {
+			points = countPoints();
+		} catch (Exception e) {
+			System.err.println(e);
+		}
+		System.out.println("Points: " + points);
+		if (points > 0) {
+			getCurrentPlayer().addPoints(points);
+			int pieceCount = placedPieces.size();
+			placedPieces.clear();
+			movePieces(bag, getCurrentPieces(), pieceCount);
+			currentPlayer = (currentPlayer + 1) % players.size();
+			firePiecesChanged(0, -1);
+		}
+	}
+
+	private int countPoints() {
+		List<BoardLocation> locations = new ArrayList<BoardLocation>(placedPieces.values());
+		Collections.sort(locations);
+		BoardLocation start = locations.get(0), end = locations.get(locations.size() - 1);
+		int dx = (int) Math.signum(end.x - start.x), dy = (int) Math.signum(end.y - start.y);
+		if (locations.size() == 1) {
+			dx = 1;
+		}
+		if (Math.signum(dx) + Math.signum(dy) != 1) {
+			throw new IllegalArgumentException("Illegal placements: " + locations + ", the word must be either across or down");
+		}
+		int x = start.x, y = start.y;
+		while (x <= end.x && y <= end.y) {
+			if (board.getPiece(x, y) == null) {
+				throw new IllegalArgumentException("Illegal placements: " + locations + ", the letters must form a consecutive sequence");
+			}
+			x += dx;
+			y += dy;
+		}
+		Map<String, Integer> wordPoints = new HashMap<String, Integer>();
+		int points = countWordPoints(start.x, start.y, dx, dy, true, words, wordPoints);
+		System.out.println(wordPoints);
+		return points;
+	}
+
+	private int countWordPoints(int x, int y, int dx, int dy, boolean countCrossingWords, Words words, Map<String, Integer> wordPoints) {
+		while (x - dx > 0 && y - dy > 0) {
+			if (board.getPiece(x - dx, y - dy) == null) {
+				break;
+			}
+			x -= dx;
+			y -= dy;
+		}
+		StringBuilder buffer = new StringBuilder();
+		int points = 0, wordMultiple = 1, crossingWordPoints = 0;
+		boolean legalPlacement = false, error = false;
+		while (x < board.getWidth() && y < board.getHeight()) {
+			Piece piece = board.getPiece(x, y);
+			if (piece == null) {
+				break;
+			}
+			char letter = piece.getLetter();
+			buffer.append(Character.toLowerCase(letter));
+			int letterPoints = (piece instanceof WildcardPiece ? 0 : letters.getPoints(letter));
+			if (isPlacedPiece(piece)) {
+				letterPoints *= board.getLetterMultiple(x, y);
+				wordMultiple *= board.getWordMultiple(x, y);
+				if (countCrossingWords) {
+					int crossingPoints = countWordPoints(x, y, dy, dx, false, words, wordPoints);
+					if (crossingPoints < 0) {
+						error = true;
+					} else {
+						crossingWordPoints += crossingPoints;
+						legalPlacement = true;
+					}
+				}
+				if (board.isStart(x, y)) {
+					legalPlacement = true;
+				}
+			} else {
+				legalPlacement = true;
+			}
+			points += letterPoints;
+			x += dx;
+			y += dy;
+		}
+		String word = (buffer.length() > 1 && (words != null || wordPoints != null) ? buffer.toString() : null);
+		if (word != null && words != null && (! words.hasWord(word))) {
+			error = true;
+		} else {
+			points = (buffer.length() > 1 ? points * wordMultiple : 0);
+		}
+		if (word != null && wordPoints != null) {
+			wordPoints.put(word, points);
+		}
+		if (points > 0 && countCrossingWords && (! legalPlacement)) {
+			throw new IllegalArgumentException("The letters must either occupy the starting point or connect to existing pieces");
+		}
+		return (error || (buffer.length() > 1 && (! legalPlacement)) ? -1 : points + crossingWordPoints);
+	}
+
+	public void placePiecesBack() {
+		List<Piece> pieces = new ArrayList<Piece>(placedPieces.keySet());
+		for (Piece piece : pieces) {
+			BoardLocation position = placedPieces.get(piece);
+			placePieceBack(position.x, position.y, getCurrentPieces().indexOf(null));
+			placedPieces.remove(piece);
+		}
+	}
+	
+	public void shufflePieces() {
+		shufflePieces(getCurrentPieces(), 10);
+		firePiecesChanged(0, -1);
+	}
+
+	//
+	
+	private List<WordFeudListener> wordFeudListeners = new ArrayList<WordFeudListener>();
+	
+	public void addWordFeudListener(WordFeudListener listener) {
+		wordFeudListeners.add(listener);
+	}
+	
+	public void removeWordFeudListener(WordFeudListener listener) {
+		wordFeudListeners.remove(listener);
+	}
+	
+	protected void firePiecesChanged(int pos) {
+		for (WordFeudListener listener : wordFeudListeners) {
+			listener.piecesChanged(pos);
+		}
+	}
+
+	protected void firePiecesChanged(int startPos, int endPos) {
+		if (endPos < 0) {
+			endPos = getCurrentPieces().size() + endPos;
+		}
+		int dx = (int) Math.signum(endPos - startPos);
+		while (true) {
+			firePiecesChanged(startPos);
+			if (startPos == endPos) {
+				break;
+			}
+			startPos += dx;
+		}
+	}
+}

@@ -1,0 +1,26 @@
+package wordfeud.core;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CompositeWords implements Words {
+
+	private List<Words> wordsList = new ArrayList<Words>();
+	
+	public void addWords(Words words) {
+		wordsList.add(words);
+	}
+	
+	public void removeWords(Words words) {
+		wordsList.remove(words);
+	}
+	
+	public boolean hasWord(String word) {
+		for (Words words : wordsList) {
+			if (words.hasWord(word)) {
+				return true;
+			}
+		}
+		return false;
+	}
+}
