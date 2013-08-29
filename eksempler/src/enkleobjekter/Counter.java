@@ -6,6 +6,7 @@ public class Counter {
 	private int counter;
 	private int end;
 
+	// public API
 	public Counter(int start, int end) {
 		this.counter = start;
 		this.end = end;
@@ -30,6 +31,7 @@ public class Counter {
 	}
 }
 
+// program class used for testing
 class CounterProgram {
 	
 	private Counter counter;
